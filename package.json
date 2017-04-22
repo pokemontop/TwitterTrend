@@ -13,7 +13,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    //"build": "browserify -t reactify ./twitmap/static/twittermap/js/main.js -o ./twitmap/templates/twittermap/build/main.min.js"
+    "build": "browserify -t reactify ./twitmap/static/twittermap/js/main.js -o ./twitmap/templates/twittermap/build/main.min.js"
   },
   "author": "jiawei tang, yifan li",
   
