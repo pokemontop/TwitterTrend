@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset=utf-8 />
+    <title>Twitter Map</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.mapbox.com/mapbox.js/v3.1.0/mapbox.js'></script>
+    <link href='https://api.mapbox.com/mapbox.js/v3.1.0/mapbox.css' rel='stylesheet' />
+    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/leaflet.markercluster.js'></script>
+    <script src="http://code.jquery.com/jquery-1.12.0.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.0/semantic.min.css"/>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.0/semantic.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"/>
+    <!--{% load staticfiles %}
+    <link href="{% static 'twittermap/img/logo.png' %}" rel="shortcut icon">-->
+    <style type="text/css">
+    body {
+    margin: 0;
+    padding: 0;
+}
+#map {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+}
+
+#twittermap-controller {
+    /*width: 20em;
+    position: fixed;
+    top: 1em;
+    right: 1em;*/
+}
+
+.tweet-cluster-icon {
+
+}
+
+.tweet-cluster-outer {
+    width: 60px;
+    height: 60px;
+    background: #89C9FA;
+    border-radius: 30px;
+}
+
+.tweet-cluster {
+    position: relative;
+    top: 5px;
+    left: 5px;
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    font-size: 30px;
+    background: #55acee;
+    text-align: center;
+    border-radius: 25px;
+    color: white;
+}
+
+/* Menu */
+.menu-container {
+  display: block;
+}
+.menu-container > div.menu {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  width: 350px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-transition: -webkit-transform ease 350ms;
+  -moz-transition: -webkit-transform ease 350ms;
+  -ms-transition: -webkit-transform ease 350ms;
+  -o-transition: -webkit-transform ease 350ms;
+  transition: -webkit-transform ease 350ms;
+  -webkit-transition: transform ease 350ms;
+  -moz-transition: transform ease 350ms;
+  -ms-transition: transform ease 350ms;
+  -o-transition: transform ease 350ms;
+  transition: transform ease 350ms;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+}
+.menu-container > div.menu > .main{
+  padding: 15px;
+}
+.menu-container > div.menu > .header {
+  color: white;
+  background-color: #55acee;
+  padding: 5px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+}
+.menu-container > div.menu.left {
+  background: white;
+  left: -350px;
+}
+.menu-container > div.menu > .footer {
+  color: white;
+  background-color: #323a45;
+  padding: 5px;
+  margin-top: 10px;
+  /* border-top: 1px solid rgba(0, 0, 0, 0.4); */
+  font-size: 9px;
+}
+.menu-container > div.menu.visible.left {
+  transform: translate3d(350px, 0, 0);
+  -ms-transform: translate3d(350px, 0, 0);
+  -webkit-transform: translate3d(350px, 0, 0);
+  -o-transform: translate3d(350px, 0, 0);
+  -moz-transform: translate3d(350px, 0, 0);
+}
+.menu-container > div.menu.right {
+  background: white;
+  right: -350px;
+}
+.menu-container > div.menu.visible.right {
+  transform: translate3d(-350px, 0, 0);
+  -ms-transform: translate3d(-350px, 0, 0);
+  -webkit-transform: translate3d(-350px, 0, 0);
+  -o-transform: translate3d(-350px, 0, 0);
+  -moz-transform: translate3d(-350px, 0, 0);
+}
+.menu-container > div > .menu-item {
+  float: left;
+  width: 100%;
+  margin: 0;
+  padding: 10px 15px;
+  border-bottom: solid 1px #555;
+  cursor: pointer;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  color: #B0B0B0;
+}
+.menu-container > div > .menu-item:hover {
+  color: #F0F0F0;
+}
+
+.menu-container > div.bars {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-transition: -webkit-transform ease 350ms;
+    -moz-transition: -webkit-transform ease 350ms;
+    -ms-transition: -webkit-transform ease 350ms;
+    -o-transition: -webkit-transform ease 350ms;
+    transition: -webkit-transform ease 350ms;
+    -webkit-transition: transform ease 350ms;
+    -moz-transition: transform ease 350ms;
+    -ms-transition: transform ease 350ms;
+    -o-transition: transform ease 350ms;
+    transition: transform ease 350ms;
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    border-right: none;
+    padding: 5px 10px;
+    background-color: #fff;
+}
+.menu-container > div.bars:hover {
+  cursor: pointer;
+}
+
+.menu-container > div.bars.right {
+    right: 0px;
+}
+.menu-container > div.bars.visible.right {
+  transform: translate3d(-350px, 0, 0);
+  -ms-transform: translate3d(-350px, 0, 0);
+  -webkit-transform: translate3d(-350px, 0, 0);
+  -o-transform: translate3d(-350px, 0, 0);
+  -moz-transform: translate3d(-350px, 0, 0);
+}
+
+.menu .accordion {
+  margin-top: 20px;
+}
+
+.menu-container .overlay {
+    background: grey url('../img/loading.gif') center center no-repeat !important;
+    opacity: .5;
+}
+
+.settings {
+  margin-left: 20px;
+}
+/* Time filter */
+/*.time-filter {
+  margin-left: 20px;
+}*/
+.time-filter label span {
+  margin-left: 5px;
+}
+.time-filter .time-units {
+
+}
+
+/* Drop pin */
+/*.drop-pin {
+  margin-left: 20px;
+}*/
+
+/* Others */
+.warning {
+  color: red;
+}
+
+/* update setting */
+/*.update-setting{
+  margin-left: 20px;
+}*/
+
+/* Counter */
+.counter-container .stat-number {
+  color: blue;
+}
+
+.counter-container .stat-number.red {
+  color: red;
+}
+
+/* applying button */
+.apply-btn{
+  position: relative;
+  left: 10px;
+  top: 10px;
+  margin-left: 20px;
+  cursor: pointer;
+  display: inline-block;
+  min-height: 1em;
+  outline: 0;
+  border: none;
+  vertical-align: baseline;
+  background: #e0e1e2;
+  font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;
+  margin: 0 .25em 0 0;
+  padding: .78571429em 1.5em;
+  text-transform: none;
+  font-weight: 700;
+  line-height: 1em;
+  font-style: normal;
+  text-align: center;
+  text-decoration: none;
+  border-radius: .28571429rem;
+  box-shadow: 0 0 0 1px transparent inset,0 0 0 0 rgba(34,36,38,.15) inset;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-transition: opacity .1s ease,background-color .1s ease,color .1s ease,box-shadow .1s ease,background .1s ease;
+  transition: opacity .1s ease,background-color .1s ease,color .1s ease,box-shadow .1s ease,background .1s ease;
+  -webkit-tap-highlight-color: transparent;
+  background-color: #55acee;
+  color: #fff;
+  text-shadow: none;
+  background-image: none;
+}
+    </style>
+    <!--<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'lib/dist/react-select.min.css' %}">-->
+</head>
+<body>
+    <div id='map'></div>
+    <div id='twittermap-controller'></div> 
+    <script type = "text/babel">
+        var React = require('react');
+var ReactDOM = require('react-dom');
+var TwitterMapController = require('./js/TwitterMapController');
+
+
+L.mapbox.accessToken = 'pk.eyJ1IjoicG9rZW1vbnRvcCIsImEiOiJjajFzdnMxY2IwMGxuMnFxa2RrYjRmc2JiIn0.IJtkGXNUjVq-bx2eG2he-w';
+var map = L.mapbox.map('map', 'mapbox.streets')
+    .setView([40, -74.50], 9);
+
+ReactDOM.render(<TwitterMapController mapbox={mapbox} />, 
+  document.getElementById('twittermap-controller'));
+    </script>
+</body>
+
+</html>
